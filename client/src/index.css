@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --color-dark-900: #0a0b0d;
+  --color-dark-800: #12141a;
+  --color-dark-700: #1a1d26;
+  --color-fintech-cyan: #00f2fe;
+  --color-fintech-blue: #4facfe;
+  --color-fintech-accent: #10b981;
+}
+
+body {
+  background-color: #0a0b0d;
+  color: #f3f4f6;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Animación de Cometas / Shooting Stars */
+@keyframes shootingStar {
+  0% {
+    transform: translateY(-100px) translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(105vh) translateX(-105vw);
+    opacity: 0;
+  }
+}
+
+.shooting-star {
+  position: absolute;
+  width: 2px;
+  height: 90px;
+  background: linear-gradient(to bottom, rgba(0, 242, 254, 1), rgba(255, 255, 255, 0));
+  animation: shootingStar linear infinite;
+  pointer-events: none;
+}
+
+/* Scrollbars minimalistas */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0b0d;
+}
+::-webkit-scrollbar-thumb {
+  background: #1a1d26;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2d3748;
+}
