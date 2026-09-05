@@ -7,7 +7,7 @@ export default function Header({ onOpenCreate }) {
       <div className="flex items-center space-x-3">
         <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full shadow-sm animate-pulse"></div>
         <h1 className="text-sm font-semibold tracking-wider text-neutral-900">
-          Kanban <span className="text-neutral-300 font-normal">//</span> Workspace
+         <span className="text-neutral-300 font-normal">//</span> JosmarDev // Kanban
         </h1>
       </div>
       <button

@@ -1,16 +1,26 @@
-# React + Vite
+# 📋 Taskify Pro - Tablero Kanban Full-Stack
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Aplicación web de gestión de tareas de nivel profesional, diseñada con una arquitectura limpia, soporte para columnas dinámicas y persistencia local mediante SQLite.
 
-Currently, two official plugins are available:
+## 🚀 Tecnologías Utilizadas
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Frontend:** React, Vite, Tailwind CSS, Lucide React, React Hot Toast.
+- **Backend:** Node.js, Express, SQLite3.
+- **Control de Versiones:** Git & GitHub.
 
-## React Compiler
+## ✨ Características Principales
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Tablero Kanban Dinámico:** Organiza tareas por columnas predeterminadas y añade tantas columnas personalizadas como necesites.
+- **Gestión de Fechas y Alertas:** Controla las fechas de inicio y fin con alertas visuales automáticas para tareas de hoy o vencidas.
+- **Búsqueda Instantánea:** Filtra tarjetas por título o descripción en tiempo real.
+- **Vistas Múltiples:** Incluye pestañas para el tablero Kanban, vista de calendario y un Inbox para notas rápidas.
+- **Drag and Drop:** Arrastra y suelta tus tareas de una columna a otra con persistencia instantánea en la base de datos.
 
-## Expanding the Oxlint configuration
+## 🛠️ Instalación y Configuración Local
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Sigue estos pasos para clonar y ejecutar el proyecto en tu máquina:
+
+1. **Clona el repositorio:**
+   ```bash
+   git clone [https://github.com/TU_USUARIO/TU_REPOSITORIO.git](https://github.com/TU_USUARIO/TU_REPOSITORIO.git)
+   cd Kanban

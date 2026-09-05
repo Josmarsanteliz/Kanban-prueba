@@ -10,9 +10,11 @@ import TaskModal from './components/TaskModal';
 import InboxView from './components/InboxView';
 
 const API_URL = 'http://localhost:5000/api/tasks';
+const COLUMNS_URL = 'http://localhost:5000/api/columns';
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
+  const [columns, setColumns] = useState([]);
   const [activeTab, setActiveTab] = useState('tasks');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
@@ -27,9 +29,45 @@ export default function App() {
     }
   };
 
+  const fetchColumns = async () => {
+    try {
+      const response = await axios.get(COLUMNS_URL);
+      setColumns(response.data.columns);
+    } catch (error) {
+      console.error('Error al cargar columnas');
+    }
+  };
+
   useEffect(() => {
     fetchTasks();
+    fetchColumns();
   }, []);
+
+  const handleCreateColumn = async (columnTitle) => {
+    if (!columnTitle.trim()) {
+      toast.error('El nombre de la columna es requerido');
+      return;
+    }
+
+    try {
+      await axios.post(COLUMNS_URL, { title: columnTitle });
+      toast.success('Columna creada correctamente');
+      fetchColumns();
+    } catch (error) {
+      toast.error('Error al crear la columna');
+    }
+  };
+
+  const handleDeleteColumn = async (columnId) => {
+    try {
+      await axios.delete(`${COLUMNS_URL}/${columnId}`);
+      toast.success('Columna eliminada (sus tareas pasaron a "Por hacer")');
+      fetchColumns();
+      fetchTasks();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Error al eliminar la columna');
+    }
+  };
 
   const handleSaveTask = async (taskData) => {
     if (!taskData.title.trim()) {
@@ -45,9 +83,10 @@ export default function App() {
         });
         toast.success('Tarea actualizada correctamente');
       } else {
+        const defaultStatus = columns.length > 0 ? columns[0].id : 'todo';
         await axios.post(API_URL, {
           ...taskData,
-          status: 'todo'
+          status: defaultStatus
         });
         toast.success('Tarea creada correctamente');
       }
@@ -137,10 +176,12 @@ export default function App() {
 
       <Header onOpenCreate={handleOpenCreate} />
 
-      {/* VISTA 1: KANBAN DE TAREAS */}
       {activeTab === 'tasks' && (
         <KanbanBoard 
           tasks={tasks}
+          columns={columns}
+          onCreateColumn={handleCreateColumn}
+          onDeleteColumn={handleDeleteColumn}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
           onDragOver={handleDragOver}
@@ -150,17 +191,14 @@ export default function App() {
         />
       )}
 
-      {/* VISTA 2: CALENDARIO */}
       {activeTab === 'calendar' && (
         <CalendarView tasks={tasks} />
       )}
 
-      {/* VISTA 3: INBOX DE NOTAS */}
       {activeTab === 'inbox' && (
         <InboxView />
       )}
 
-      {/* BARRA DE NAVEGACIÓN FLOTANTE */}
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <TaskModal 
