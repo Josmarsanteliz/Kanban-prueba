@@ -5,7 +5,7 @@ import { Toaster, toast } from 'react-hot-toast';
 import Header from './components/Header';
 import Navbar from './components/Navbar';
 import KanbanBoard from './components/KanbanBoard';
-import CalendarView from './components/CalendarView';
+import CalendarView from './components/CalendarView.jsx';
 import TaskModal from './components/TaskModal';
 import InboxView from './components/InboxView';
 
