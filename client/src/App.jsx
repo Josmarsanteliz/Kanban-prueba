@@ -9,8 +9,11 @@ import CalendarView from './components/CalendarView';
 import TaskModal from './components/TaskModal';
 import InboxView from './components/InboxView';
 
-const API_URL = 'http://localhost:5000/api/tasks';
-const COLUMNS_URL = 'http://localhost:5000/api/columns';
+// URL base dinámica (lee de Vercel/Netlify o usa Render por defecto)
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://kanban-prueba-1.onrender.com';
+
+const API_URL = `${BACKEND_URL}/api/tasks`;
+const COLUMNS_URL = `${BACKEND_URL}/api/columns`;
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
