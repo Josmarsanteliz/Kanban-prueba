@@ -1,93 +1,113 @@
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
-//prueba
-export default function CalendarView({ tasks }) {
-  const [currentDate, setCurrentDate] = useState(new Date());
+import React, { useState, useEffect } from 'react';
+import { Send, Trash2, FileText } from 'lucide-react';
 
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://kanban-prueba-1.onrender.com';
+const NOTES_URL = `${BACKEND_URL}/api/notes`;
 
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDayIndex = new Date(year, month, 1).getDay(); // 0 = Domingo
+export default function InboxView() {
+  const [notes, setNotes] = useState([]);
+  const [newContent, setNewContent] = useState('');
 
-  const monthNames = [
-    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
-    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-  ];
+  useEffect(() => {
+    fetch(NOTES_URL)
+      .then(res => res.json())
+      .then(data => setNotes(data.notes || []))
+      .catch(err => console.error("Error al cargar notas:", err));
+  }, []);
 
-  const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
-  const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
+  const handleAddNoteSubmit = async (e) => {
+    e.preventDefault();
+    if (!newContent.trim()) return;
+
+    try {
+      const response = await fetch(NOTES_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: newContent })
+      });
+      const data = await response.json();
+      
+      if (response.ok) {
+        setNotes([data, ...notes]);
+        setNewContent('');
+      }
+    } catch (error) {
+      console.error("Error al guardar nota:", error);
+    }
+  };
+
+  const handleDeleteNote = async (id) => {
+    try {
+      const response = await fetch(`${NOTES_URL}/${id}`, {
+        method: 'DELETE'
+      });
+      if (response.ok) {
+        setNotes(notes.filter(note => note.id !== id));
+      }
+    } catch (error) {
+      console.error("Error al eliminar nota:", error);
+    }
+  };
 
   return (
-    <main className="flex-1 p-10 max-w-5xl mx-auto w-full z-10 animate-in fade-in duration-200">
-      <div className="bg-neutral-50 border border-neutral-200 rounded-3xl p-8 shadow-sm">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-lg font-bold text-neutral-900">
-            {monthNames[month]} {year}
-          </h2>
-          <div className="flex items-center space-x-2">
-            <button onClick={prevMonth} className="p-2.5 bg-white border border-neutral-200 rounded-xl hover:bg-neutral-100 cursor-pointer shadow-2xs">
-              <ChevronLeft className="w-4 h-4 text-neutral-700" />
-            </button>
-            <button onClick={nextMonth} className="p-2.5 bg-white border border-neutral-200 rounded-xl hover:bg-neutral-100 cursor-pointer shadow-2xs">
-              <ChevronRight className="w-4 h-4 text-neutral-700" />
-            </button>
-          </div>
+    <main className="flex-1 p-10 max-w-3xl mx-auto w-full z-10 animate-in fade-in duration-200">
+      <div className="bg-neutral-50 border border-neutral-200 rounded-3xl p-8 shadow-sm flex flex-col h-[75vh]">
+        
+        <div className="mb-6">
+          <h2 className="text-lg font-bold text-neutral-900 tracking-tight">Inbox & Notas Rápidas</h2>
+          <p className="text-xs text-neutral-500 mt-0.5">Captura ideas al vuelo. (Preparado para futuras automatizaciones)</p>
         </div>
 
-        <div className="grid grid-cols-7 gap-2 mb-2 text-center text-xs font-semibold text-neutral-400 uppercase">
-          <div>Dom</div><div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div>
-        </div>
+        <form onSubmit={handleAddNoteSubmit} className="flex gap-2 mb-6">
+          <input
+            type="text"
+            value={newContent}
+            onChange={(e) => setNewContent(e.target.value)}
+            placeholder="Escribe una nota rápida o idea..."
+            className="flex-1 bg-white border border-neutral-200 rounded-2xl px-4 py-3 text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-emerald-500 shadow-xs"
+          />
+          <button
+            type="submit"
+            className="bg-neutral-900 hover:bg-neutral-800 text-white font-semibold px-5 py-3 rounded-2xl text-sm transition-all shadow-md flex items-center gap-2 cursor-pointer"
+          >
+            <Send className="w-4 h-4" />
+            <span>Guardar</span>
+          </button>
+        </form>
 
-        <div className="grid grid-cols-7 gap-3">
-          {Array.from({ length: firstDayIndex }).map((_, index) => (
-            <div key={`empty-${index}`} className="h-28 bg-transparent border border-transparent rounded-2xl"></div>
-          ))}
-
-          {Array.from({ length: daysInMonth }).map((_, index) => {
-            const dayNumber = index + 1;
-            const formattedMonth = String(month + 1).padStart(2, '0');
-            const formattedDay = String(dayNumber).padStart(2, '0');
-            const dateString = `${year}-${formattedMonth}-${formattedDay}`;
-
-            const dayTasks = tasks.filter(t => {
-              const rawStart = t.startDate || t.start_date;
-              const rawEnd = t.endDate || t.end_date;
-
-              if (!rawStart && !rawEnd) return false;
-              
-              const start = rawStart ? rawStart.substring(0, 10) : (rawEnd ? rawEnd.substring(0, 10) : '');
-              const end = rawEnd ? rawEnd.substring(0, 10) : (rawStart ? rawStart.substring(0, 10) : '');
-              
-              return dateString >= start && dateString <= end;
-            });
-
-            return (
+        <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+          {notes.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-neutral-400 text-sm">
+              <FileText className="w-10 h-10 mb-2 stroke-1" />
+              <p>No tienes notas en tu inbox todavía.</p>
+            </div>
+          ) : (
+            notes.map(note => (
               <div 
-                key={dayNumber} 
-                className={`h-28 bg-white border rounded-2xl p-2.5 flex flex-col justify-between overflow-hidden shadow-2xs transition-all ${
-                  dateString === new Date().toISOString().split('T')[0] 
-                    ? 'border-emerald-500 ring-1 ring-emerald-500/30' 
-                    : 'border-neutral-200'
-                }`}
+                key={note.id}
+                className="bg-white border border-neutral-200 p-4 rounded-2xl flex items-center justify-between shadow-2xs group hover:border-neutral-300 transition-all"
               >
-                <span className="text-xs font-semibold text-neutral-700">{dayNumber}</span>
-                <div className="flex-1 overflow-y-auto space-y-1 mt-1 pr-0.5">
-                  {dayTasks.map(task => (
-                    <div 
-                      key={task.id} 
-                      className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-md truncate font-medium flex items-center space-x-1" 
-                      title={task.title}
-                    >
-                      <CalendarIcon className="w-2.5 h-2.5 shrink-0 text-emerald-600" />
-                      <span className="truncate">{task.title}</span>
-                    </div>
-                  ))}
+                <div className="flex items-start gap-3 overflow-hidden">
+                  <FileText className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-sm text-neutral-800 font-medium break-words">{note.content}</p>
+                    <span className="text-[10px] text-neutral-400 mt-1 block">
+                      {new Date(note.createdAt).toLocaleString()}
+                    </span>
+                  </div>
                 </div>
+                <button
+                  onClick={() => handleDeleteNote(note.id)}
+                  className="text-neutral-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 transition-colors cursor-pointer opacity-80 sm:opacity-0 group-hover:opacity-100"
+                  title="Eliminar nota"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
-            );
-          })}
+            ))
+          )}
         </div>
+
       </div>
     </main>
   );

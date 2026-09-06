@@ -1,42 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Send, Trash2, FileText } from 'lucide-react';
 
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://kanban-prueba-1.onrender.com';
+const NOTES_URL = `${BACKEND_URL}/api/notes`;
+
 export default function InboxView() {
   const [notes, setNotes] = useState([]);
   const [newContent, setNewContent] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/notes')
+    fetch(NOTES_URL)
       .then(res => res.json())
       .then(data => setNotes(data.notes || []))
       .catch(err => console.error("Error al cargar notas:", err));
   }, []);
 
-  const handleAddNote = async (e) => {
-    e.preventDefault();
-    if (!newContent.trim()) return;
-
-    try {
-      const response = await fetch('http://localhost:5000/api/notes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.json({ content: newContent })
-      });
-      
-      // Nota: Asegúrate de parsear el body correcto
-      // let data = await response.json();
-    } catch (error) {
-      // Manejo de error básico o temporal
-    }
-  };
-
-  // Versión limpia y corregida del manejador de notas:
   const handleAddNoteSubmit = async (e) => {
     e.preventDefault();
     if (!newContent.trim()) return;
 
     try {
-      const response = await fetch('http://localhost:5000/api/notes', {
+      const response = await fetch(NOTES_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: newContent })
@@ -54,7 +38,7 @@ export default function InboxView() {
 
   const handleDeleteNote = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/notes/${id}`, {
+      const response = await fetch(`${NOTES_URL}/${id}`, {
         method: 'DELETE'
       });
       if (response.ok) {
